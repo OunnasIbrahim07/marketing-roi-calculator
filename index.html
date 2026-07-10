@@ -4,20 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Marketing ROI & ROAS Calculator 📊</title>
+    <!-- Chart.js library for beautiful graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Dark Theme & Layout */
         :root {
-            --primary: #2563eb;
-            --success: #16a34a;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
+            --primary-neon: #3b82f6; /* Neon Blue */
+            --primary-hover: #60a5fa;
+            --success-neon: #10b981; /* Neon Green */
+            --danger-neon: #ef4444; /* Neon Red */
+            --bg-dark: #0f172a; /* Deep Dark Blue-Grey */
+            --card-glass: rgba(30, 41, 59, 0.7); /* Translucent Card */
+            --text-main: #f1f5f9; /* Near White */
+            --text-muted: #94a3b8; /* Greyed Text */
+            --input-bg: rgba(51, 65, 85, 0.5); /* Darker Input */
+            --border-glass: rgba(148, 163, 184, 0.2); /* Soft Border */
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -25,74 +35,154 @@
             align-items: center;
             min-height: 100vh;
         }
+
+        /* Glassmorphism Card Effect */
         .container {
-            background: var(--card);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             width: 100%;
             max-width: 550px;
+            transition: transform 0.3s ease;
         }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
         h2 {
             text-align: center;
-            color: var(--primary);
-            margin-bottom: 25px;
+            color: var(--text-main);
+            margin-bottom: 30px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
         }
+
         .input-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: 600;
             font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
         }
+
+        /* Styling Inputs with Dark Background */
         input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
+            padding: 14px 18px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
             box-sizing: border-box;
             font-size: 16px;
+            color: var(--text-main);
+            transition: all 0.3s ease;
         }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            background-color: rgba(51, 65, 85, 0.8);
+        }
+        
+        input::placeholder {
+            color: rgba(148, 163, 184, 0.6);
+        }
+
+        /* Neon Blue Button */
         button {
             width: 100%;
-            background: var(--primary);
+            background: var(--primary-neon);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 10px;
-            transition: 0.3s;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
+        
         button:hover {
-            background: #1d4ed8;
+            background: var(--primary-hover);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
         }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Darker Results Box */
         .results {
-            margin-top: 25px;
-            padding: 15px;
-            background: #f1f5f9;
-            border-radius: 8px;
+            margin-top: 35px;
+            padding: 25px;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
+            border: 1px solid var(--border-glass);
             display: none;
+            animation: fadeIn 0.5s ease;
         }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .result-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            align-items: center;
+            margin-bottom: 15px;
             font-size: 16px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding-bottom: 10px;
         }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .result-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Highlights with Neon Colors */
         .highlight {
-            font-weight: bold;
-            color: var(--success);
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--success-neon);
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
         }
+        
+        .highlight.negative {
+            color: var(--danger-neon);
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+        }
+
         .chart-container {
-            margin-top: 20px;
-            max-height: 250px;
+            margin-top: 30px;
+            max-height: 280px;
             display: flex;
             justify-content: center;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
         }
     </style>
 </head>
@@ -120,15 +210,15 @@
     
     <div class="results" id="resultsBox">
         <div class="result-item">
-            <span>Return on Ad Spend (ROAS):</span>
+            <span class="result-label">Return on Ad Spend (ROAS):</span>
             <span id="roasVal" class="highlight">0</span>
         </div>
         <div class="result-item">
-            <span>Net Profit ($):</span>
+            <span class="result-label">Net Profit ($):</span>
             <span id="netProfitVal" class="highlight">0</span>
         </div>
         <div class="result-item">
-            <span>Return on Investment (ROI):</span>
+            <span class="result-label">Return on Investment (ROI):</span>
             <span id="roiVal" class="highlight">0</span>
         </div>
         
@@ -140,6 +230,10 @@
 
 <script>
     let myChart = null;
+
+    // Chart.js default font settings for Dark Mode
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Segoe UI', sans-serif";
 
     function calculateROI() {
         const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
@@ -161,10 +255,14 @@
         document.getElementById('roiVal').innerText = roi + " %";
         
         const profitSpan = document.getElementById('netProfitVal');
+        const roiSpan = document.getElementById('roiVal');
+        
         if (netProfit < 0) {
-            profitSpan.style.color = "var(--danger)";
+            profitSpan.className = "highlight negative";
+            roiSpan.className = "highlight negative";
         } else {
-            profitSpan.style.color = "var(--success)";
+            profitSpan.className = "highlight";
+            roiSpan.className = "highlight";
         }
         
         document.getElementById('resultsBox').style.display = "block";
@@ -184,14 +282,32 @@
                 labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
                 datasets: [{
                     data: [adSpend, costs, displayProfit],
-                    backgroundColor: ['#2563eb', '#cbd5e1', '#16a34a'],
-                    borderWidth: 1
+                    backgroundColor: ['#3b82f6', '#475569', '#10b981'], /* Neon Blue, Slate Grey, Neon Green */
+                    borderColor: '#1e293b', /* Matching dark theme */
+                    borderWidth: 2,
+                    hoverOffset: 10
                 }]
             },
             options: {
                 responsive: true,
+                cutout: '65%', // Thinner doughnut for sleeker look
                 plugins: {
-                    legend: { position: 'bottom' }
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: { size: 12, weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#f1f5f9',
+                        borderColor: 'rgba(148, 163, 184, 0.2)',
+                        borderWidth: 1,
+                        padding: 12,
+                        cornerRadius: 8
+                    }
                 }
             }
         });
