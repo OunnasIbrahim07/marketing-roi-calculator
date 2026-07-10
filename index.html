@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart ROI & ROAS Calculator for Marketers 📊</title>
+    <title>Advanced Marketing ROI & ROAS Calculator 📊</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -30,7 +31,7 @@
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
         }
         h2 {
             text-align: center;
@@ -87,12 +88,18 @@
             font-weight: bold;
             color: var(--success);
         }
+        .chart-container {
+            margin-top: 20px;
+            max-height: 250px;
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Marketing ROI & ROAS Calculator 📊</h2>
+    <h2>Advanced ROI & ROAS Calculator 📊</h2>
     
     <div class="input-group">
         <label>Total Ad Spend ($):</label>
@@ -124,10 +131,16 @@
             <span>Return on Investment (ROI):</span>
             <span id="roiVal" class="highlight">0</span>
         </div>
+        
+        <div class="chart-container">
+            <canvas id="profitChart"></canvas>
+        </div>
     </div>
 </div>
 
 <script>
+    let myChart = null;
+
     function calculateROI() {
         const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
         const revenue = parseFloat(document.getElementById('revenue').value) || 0;
@@ -138,18 +151,15 @@
             return;
         }
         
-        // Calculations
         const roas = adSpend > 0 ? (revenue / adSpend).toFixed(2) : 0;
         const netProfit = revenue - (adSpend + costs);
         const totalInvestment = adSpend + costs;
         const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
         
-        // Display Results
         document.getElementById('roasVal').innerText = roas + " x";
         document.getElementById('netProfitVal').innerText = netProfit + " $";
         document.getElementById('roiVal').innerText = roi + " %";
         
-        // Change profit color to red if it's a loss
         const profitSpan = document.getElementById('netProfitVal');
         if (netProfit < 0) {
             profitSpan.style.color = "var(--danger)";
@@ -158,6 +168,33 @@
         }
         
         document.getElementById('resultsBox').style.display = "block";
+
+        // Generate Chart
+        const ctx = document.getElementById('profitChart').getContext('2d');
+        
+        if (myChart) {
+            myChart.destroy(); // Reset chart on new calculation
+        }
+
+        const displayProfit = netProfit > 0 ? netProfit : 0;
+
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
+                datasets: [{
+                    data: [adSpend, costs, displayProfit],
+                    backgroundColor: ['#2563eb', '#cbd5e1', '#16a34a'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
     }
 </script>
 
