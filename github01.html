@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ROI & ROAS Calculator for Marketers 📊</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .results {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            display: none;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: var(--success);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Marketing ROI & ROAS Calculator 📊</h2>
+    
+    <div class="input-group">
+        <label>Total Ad Spend ($):</label>
+        <input type="number" id="adSpend" placeholder="e.g. 100" required>
+    </div>
+    
+    <div class="input-group">
+        <label>Total Revenue Generated ($):</label>
+        <input type="number" id="revenue" placeholder="e.g. 350" required>
+    </div>
+    
+    <div class="input-group">
+        <label>Product Cost & Shipping ($):</label>
+        <input type="number" id="costs" placeholder="e.g. 120" required>
+    </div>
+    
+    <button onclick="calculateROI()">Calculate Results 🚀</button>
+    
+    <div class="results" id="resultsBox">
+        <div class="result-item">
+            <span>Return on Ad Spend (ROAS):</span>
+            <span id="roasVal" class="highlight">0</span>
+        </div>
+        <div class="result-item">
+            <span>Net Profit ($):</span>
+            <span id="netProfitVal" class="highlight">0</span>
+        </div>
+        <div class="result-item">
+            <span>Return on Investment (ROI):</span>
+            <span id="roiVal" class="highlight">0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calculateROI() {
+        const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
+        const revenue = parseFloat(document.getElementById('revenue').value) || 0;
+        const costs = parseFloat(document.getElementById('costs').value) || 0;
+        
+        if (adSpend === 0 && revenue === 0) {
+            alert("Please enter valid numbers to calculate!");
+            return;
+        }
+        
+        // Calculations
+        const roas = adSpend > 0 ? (revenue / adSpend).toFixed(2) : 0;
+        const netProfit = revenue - (adSpend + costs);
+        const totalInvestment = adSpend + costs;
+        const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
+        
+        // Display Results
+        document.getElementById('roasVal').innerText = roas + " x";
+        document.getElementById('netProfitVal').innerText = netProfit + " $";
+        document.getElementById('roiVal').innerText = roi + " %";
+        
+        // Change profit color to red if it's a loss
+        const profitSpan = document.getElementById('netProfitVal');
+        if (netProfit < 0) {
+            profitSpan.style.color = "var(--danger)";
+        } else {
+            profitSpan.style.color = "var(--success)";
+        }
+        
+        document.getElementById('resultsBox').style.display = "block";
+    }
+</script>
+
+</body>
+</html>
