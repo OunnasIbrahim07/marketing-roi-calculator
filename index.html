@@ -57,7 +57,7 @@
         h2 {
             text-align: center;
             color: var(--text-main);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             font-weight: 800;
             letter-spacing: -1px;
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
@@ -76,8 +76,8 @@
             letter-spacing: 0.5px;
         }
 
-        /* Styling Inputs with Dark Background */
-        input {
+        /* Styling Inputs & Select with Dark Background */
+        input, select {
             width: 100%;
             padding: 14px 18px;
             background-color: var(--input-bg);
@@ -89,11 +89,16 @@
             transition: all 0.3s ease;
         }
         
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: var(--primary-neon);
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
             background-color: rgba(51, 65, 85, 0.8);
+        }
+
+        select option {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
         }
         
         input::placeholder {
@@ -122,10 +127,6 @@
             background: var(--primary-hover);
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
             transform: translateY(-2px);
-        }
-        
-        button:active {
-            transform: translateY(1px);
         }
 
         /* Darker Results Box */
@@ -191,18 +192,28 @@
 <div class="container">
     <h2>Advanced ROI & ROAS Calculator 📊</h2>
     
+    <!-- Currency Selector Feature -->
     <div class="input-group">
-        <label>Total Ad Spend ($):</label>
+        <label for="currency">Select Currency / اختر العملة:</label>
+        <select id="currency" onchange="updateCurrencyLabels()">
+            <option value="DA">DA (دج - Algerian Dinar)</option>
+            <option value="$">USD ($ - US Dollar)</option>
+            <option value="€">EUR (€ - Euro)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>Total Ad Spend (<span class="curr-label">DA</span>):</label>
         <input type="number" id="adSpend" placeholder="e.g. 100" required>
     </div>
     
     <div class="input-group">
-        <label>Total Revenue Generated ($):</label>
+        <label>Total Revenue Generated (<span class="curr-label">DA</span>):</label>
         <input type="number" id="revenue" placeholder="e.g. 350" required>
     </div>
     
     <div class="input-group">
-        <label>Product Cost & Shipping ($):</label>
+        <label>Product Cost & Shipping (<span class="curr-label">DA</span>):</label>
         <input type="number" id="costs" placeholder="e.g. 120" required>
     </div>
     
@@ -214,7 +225,7 @@
             <span id="roasVal" class="highlight">0</span>
         </div>
         <div class="result-item">
-            <span class="result-label">Net Profit ($):</span>
+            <span class="result-label">Net Profit (<span class="curr-label">DA</span>):</span>
             <span id="netProfitVal" class="highlight">0</span>
         </div>
         <div class="result-item">
@@ -231,14 +242,27 @@
 <script>
     let myChart = null;
 
-    // Chart.js default font settings for Dark Mode
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+    // Function to update input labels dynamically when currency changes
+    function updateCurrencyLabels() {
+        const selectedCurrency = document.getElementById('currency').value;
+        const labels = document.getElementsByClassName('curr-label');
+        for(let i = 0; i < labels.length; i++) {
+            labels[i].innerText = selectedCurrency;
+        }
+        // If results are already visible, recalculate to update currency sign in results
+        if(document.getElementById('resultsBox').style.display === "block") {
+            calculateROI();
+        }
+    }
 
     function calculateROI() {
         const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
         const revenue = parseFloat(document.getElementById('revenue').value) || 0;
         const costs = parseFloat(document.getElementById('costs').value) || 0;
+        const currentCurrency = document.getElementById('currency').value;
         
         if (adSpend === 0 && revenue === 0) {
             alert("Please enter valid numbers to calculate!");
@@ -251,7 +275,7 @@
         const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
         
         document.getElementById('roasVal').innerText = roas + " x";
-        document.getElementById('netProfitVal').innerText = netProfit + " $";
+        document.getElementById('netProfitVal').innerText = netProfit.toFixed(2) + " " + currentCurrency;
         document.getElementById('roiVal').innerText = roi + " %";
         
         const profitSpan = document.getElementById('netProfitVal');
@@ -267,11 +291,10 @@
         
         document.getElementById('resultsBox').style.display = "block";
 
-        // Generate Chart
         const ctx = document.getElementById('profitChart').getContext('2d');
         
         if (myChart) {
-            myChart.destroy(); // Reset chart on new calculation
+            myChart.destroy();
         }
 
         const displayProfit = netProfit > 0 ? netProfit : 0;
@@ -282,15 +305,15 @@
                 labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
                 datasets: [{
                     data: [adSpend, costs, displayProfit],
-                    backgroundColor: ['#3b82f6', '#475569', '#10b981'], /* Neon Blue, Slate Grey, Neon Green */
-                    borderColor: '#1e293b', /* Matching dark theme */
+                    backgroundColor: ['#3b82f6', '#475569', '#10b981'],
+                    borderColor: '#1e293b',
                     borderWidth: 2,
                     hoverOffset: 10
                 }]
             },
             options: {
                 responsive: true,
-                cutout: '65%', // Thinner doughnut for sleeker look
+                cutout: '65%',
                 plugins: {
                     legend: { 
                         position: 'bottom',
