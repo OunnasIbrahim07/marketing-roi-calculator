@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Marketing ROI & ROAS Calculator 📊</title>
-    <!-- Chart.js library for beautiful graphs -->
+    <title>DZ E-commerce ROI & ROAS Calculator 📊</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Dark Theme & Layout */
@@ -57,10 +56,17 @@
         h2 {
             text-align: center;
             color: var(--text-main);
-            margin-bottom: 25px;
+            margin-bottom: 5px;
             font-weight: 800;
             letter-spacing: -1px;
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 25px;
         }
 
         .input-group {
@@ -190,31 +196,30 @@
 <body>
 
 <div class="container">
-    <h2>Advanced ROI & ROAS Calculator 📊</h2>
+    <h2>DZ ROI & ROAS Calculator 📊</h2>
+    <div class="subtitle">حاسبة الأرباح المخصصة للتجارة الإلكترونية في الجزائر</div>
     
-    <!-- Currency Selector Feature -->
     <div class="input-group">
-        <label for="currency">Select Currency / اختر العملة:</label>
-        <select id="currency" onchange="updateCurrencyLabels()">
-            <option value="DA">DA (دج - Algerian Dinar)</option>
+        <label for="adsCurrency">Ads Currency / عملة الحساب الإعلاني:</label>
+        <select id="adsCurrency" onchange="updateAdLabel()">
             <option value="$">USD ($ - US Dollar)</option>
             <option value="€">EUR (€ - Euro)</option>
         </select>
     </div>
 
     <div class="input-group">
-        <label>Total Ad Spend (<span class="curr-label">DA</span>):</label>
-        <input type="number" id="adSpend" placeholder="e.g. 100" required>
+        <label>Total Ad Spend (<span id="adCurrLabel">$</span>):</label>
+        <input type="number" id="adSpend" placeholder="مصاريف الإعلانات" required>
     </div>
     
     <div class="input-group">
-        <label>Total Revenue Generated (<span class="curr-label">DA</span>):</label>
-        <input type="number" id="revenue" placeholder="e.g. 350" required>
+        <label>Total Revenue Generated (DA):</label>
+        <input type="number" id="revenue" placeholder="إجمالي المبيعات بالدينار" required>
     </div>
     
     <div class="input-group">
-        <label>Product Cost & Shipping (<span class="curr-label">DA</span>):</label>
-        <input type="number" id="costs" placeholder="e.g. 120" required>
+        <label>Product Cost & Shipping (DA):</label>
+        <input type="number" id="costs" placeholder="ثمن السلعة + تكلفة التوصيل الكلية" required>
     </div>
     
     <button onclick="calculateROI()">Calculate Results 🚀</button>
@@ -225,7 +230,7 @@
             <span id="roasVal" class="highlight">0</span>
         </div>
         <div class="result-item">
-            <span class="result-label">Net Profit (<span class="curr-label">DA</span>):</span>
+            <span class="result-label">Net Profit / صافي الربح (DA):</span>
             <span id="netProfitVal" class="highlight">0</span>
         </div>
         <div class="result-item">
@@ -245,14 +250,10 @@
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Segoe UI', sans-serif";
 
-    // Function to update input labels dynamically when currency changes
-    function updateCurrencyLabels() {
-        const selectedCurrency = document.getElementById('currency').value;
-        const labels = document.getElementsByClassName('curr-label');
-        for(let i = 0; i < labels.length; i++) {
-            labels[i].innerText = selectedCurrency;
-        }
-        // If results are already visible, recalculate to update currency sign in results
+    // Update the currency symbol next to Ad Spend
+    function updateAdLabel() {
+        const selectedCurrency = document.getElementById('adsCurrency').value;
+        document.getElementById('adCurrLabel').innerText = selectedCurrency;
         if(document.getElementById('resultsBox').style.display === "block") {
             calculateROI();
         }
@@ -262,20 +263,41 @@
         const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
         const revenue = parseFloat(document.getElementById('revenue').value) || 0;
         const costs = parseFloat(document.getElementById('costs').value) || 0;
-        const currentCurrency = document.getElementById('currency').value;
+        const adsCurrency = document.getElementById('adsCurrency').value;
         
         if (adSpend === 0 && revenue === 0) {
-            alert("Please enter valid numbers to calculate!");
+            alert("Please enter valid numbers / يرجى إدخال أرقام صحيحة");
             return;
         }
+
+        // Exchange rates (Black Market / Parallel Market estimation)
+        // 1 USD = 220 DA | 1 EUR = 240 DA
+        const usdRate = 220;
+        const eurRate = 240;
         
-        const roas = adSpend > 0 ? (revenue / adSpend).toFixed(2) : 0;
-        const netProfit = revenue - (adSpend + costs);
-        const totalInvestment = adSpend + costs;
-        const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
+        let adSpendInDA = adSpend;
+        if (adsCurrency === '$') {
+            adSpendInDA = adSpend * usdRate;
+        } else if (adsCurrency === '€') {
+            adSpendInDA = adSpend * eurRate;
+        }
+        
+        // ROAS calculation is standard (Revenue / Ad Spend in the same value context)
+        // Since ROAS = Revenue / AdSpend, we can convert Revenue to Ads currency or vice versa.
+        // Let's do: Revenue in Currency / AdSpend
+        let revenueInAdsCurrency = revenue;
+        if (adsCurrency === '$') { revenueInAdsCurrency = revenue / usdRate; }
+        else if (adsCurrency === '€') { revenueInAdsCurrency = revenue / eurRate; }
+        
+        const roas = adSpend > 0 ? (revenueInAdsCurrency / adSpend).toFixed(2) : 0;
+        
+        // Net Profit always in DA (since local business relies on DA)
+        const netProfit = revenue - (adSpendInDA + costs);
+        const totalInvestmentInDA = adSpendInDA + costs;
+        const roi = totalInvestmentInDA > 0 ? ((netProfit / totalInvestmentInDA) * 100).toFixed(1) : 0;
         
         document.getElementById('roasVal').innerText = roas + " x";
-        document.getElementById('netProfitVal').innerText = netProfit.toFixed(2) + " " + currentCurrency;
+        document.getElementById('netProfitVal').innerText = netProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + " DA";
         document.getElementById('roiVal').innerText = roi + " %";
         
         const profitSpan = document.getElementById('netProfitVal');
@@ -302,9 +324,9 @@
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
+                labels: ['Ad Spend (DA)', 'Product & Shipping (DA)', 'Net Profit (DA)'],
                 datasets: [{
-                    data: [adSpend, costs, displayProfit],
+                    data: [adSpendInDA, costs, displayProfit],
                     backgroundColor: ['#3b82f6', '#475569', '#10b981'],
                     borderColor: '#1e293b',
                     borderWidth: 2,
@@ -319,7 +341,7 @@
                         position: 'bottom',
                         labels: {
                             padding: 20,
-                            font: { size: 12, weight: '600' }
+                            font: { size: 11, weight: '600' }
                         }
                     },
                     tooltip: {
