@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DZ E-commerce ROI & ROAS Calculator 📊</title>
+    <title>E-commerce ROI & ROAS Calculator 📊</title>
+    <!-- Chart.js library for beautiful graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Dark Theme & Layout */
@@ -12,6 +13,7 @@
             --primary-hover: #60a5fa;
             --success-neon: #10b981; /* Neon Green */
             --danger-neon: #ef4444; /* Neon Red */
+            --affiliate-neon: #ff007f; /* Neon Pink for Affiliate */
             --bg-dark: #0f172a; /* Deep Dark Blue-Grey */
             --card-glass: rgba(30, 41, 59, 0.7); /* Translucent Card */
             --text-main: #f1f5f9; /* Near White */
@@ -56,17 +58,10 @@
         h2 {
             text-align: center;
             color: var(--text-main);
-            margin-bottom: 5px;
+            margin-bottom: 30px;
             font-weight: 800;
             letter-spacing: -1px;
             text-shadow: 0 0 15px rgba(255,255,255,0.2);
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 25px;
         }
 
         .input-group {
@@ -82,8 +77,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* Styling Inputs & Select with Dark Background */
-        input, select {
+        input {
             width: 100%;
             padding: 14px 18px;
             background-color: var(--input-bg);
@@ -95,23 +89,17 @@
             transition: all 0.3s ease;
         }
         
-        input:focus, select:focus {
+        input:focus {
             outline: none;
             border-color: var(--primary-neon);
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
             background-color: rgba(51, 65, 85, 0.8);
-        }
-
-        select option {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
         }
         
         input::placeholder {
             color: rgba(148, 163, 184, 0.6);
         }
 
-        /* Neon Blue Button */
         button {
             width: 100%;
             background: var(--primary-neon);
@@ -135,7 +123,6 @@
             transform: translateY(-2px);
         }
 
-        /* Darker Results Box */
         .results {
             margin-top: 35px;
             padding: 25px;
@@ -171,7 +158,6 @@
             font-weight: 500;
         }
 
-        /* Highlights with Neon Colors */
         .highlight {
             font-weight: 800;
             font-size: 18px;
@@ -191,35 +177,73 @@
             justify-content: center;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
         }
+
+        /* High-Value Affiliate Section */
+        .partner-section {
+            margin-top: 35px;
+            border-top: 1px dashed var(--border-glass);
+            padding-top: 25px;
+            text-align: center;
+        }
+
+        .partner-title {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .affiliate-btn {
+            display: block;
+            background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%);
+            color: white;
+            text-decoration: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .affiliate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.5);
+            filter: brightness(1.1);
+        }
+
+        .affiliate-btn.secondary {
+            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .affiliate-btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>DZ ROI & ROAS Calculator 📊</h2>
-    <div class="subtitle">حاسبة الأرباح المخصصة للتجارة الإلكترونية في الجزائر</div>
+    <h2>E-commerce ROI & ROAS Calculator 📊</h2>
     
     <div class="input-group">
-        <label for="adsCurrency">Ads Currency / عملة الحساب الإعلاني:</label>
-        <select id="adsCurrency" onchange="updateAdLabel()">
-            <option value="$">USD ($ - US Dollar)</option>
-            <option value="€">EUR (€ - Euro)</option>
-        </select>
-    </div>
-
-    <div class="input-group">
-        <label>Total Ad Spend (<span id="adCurrLabel">$</span>):</label>
-        <input type="number" id="adSpend" placeholder="مصاريف الإعلانات" required>
+        <label>Total Ad Spend ($):</label>
+        <input type="number" id="adSpend" placeholder="e.g. 100" required>
     </div>
     
     <div class="input-group">
-        <label>Total Revenue Generated (DA):</label>
-        <input type="number" id="revenue" placeholder="إجمالي المبيعات بالدينار" required>
+        <label>Total Revenue Generated ($):</label>
+        <input type="number" id="revenue" placeholder="e.g. 350" required>
     </div>
     
     <div class="input-group">
-        <label>Product Cost & Shipping (DA):</label>
-        <input type="number" id="costs" placeholder="ثمن السلعة + تكلفة التوصيل الكلية" required>
+        <label>Product Cost & Shipping ($):</label>
+        <input type="number" id="costs" placeholder="e.g. 120" required>
     </div>
     
     <button onclick="calculateROI()">Calculate Results 🚀</button>
@@ -230,7 +254,7 @@
             <span id="roasVal" class="highlight">0</span>
         </div>
         <div class="result-item">
-            <span class="result-label">Net Profit / صافي الربح (DA):</span>
+            <span class="result-label">Net Profit ($):</span>
             <span id="netProfitVal" class="highlight">0</span>
         </div>
         <div class="result-item">
@@ -242,6 +266,15 @@
             <canvas id="profitChart"></canvas>
         </div>
     </div>
+
+    <!-- The Money Machine Section -->
+    <div class="partner-section">
+        <div class="partner-title">🔥 Scale Your Ads Like a Pro</div>
+        <!-- Replace '#' with your actual affiliate link from Minea -->
+        <a href="#" target="_blank" class="affiliate-btn">🚀 Spy on Competitors' Winning Ads with Minea</a>
+        <!-- Replace '#' with your actual affiliate link from PiPiADS -->
+        <a href="#" target="_blank" class="affiliate-btn secondary">💎 Find Viral TikTok Products with PiPiADS</a>
+    </div>
 </div>
 
 <script>
@@ -250,54 +283,23 @@
     Chart.defaults.color = '#94a3b8';
     Chart.defaults.font.family = "'Segoe UI', sans-serif";
 
-    // Update the currency symbol next to Ad Spend
-    function updateAdLabel() {
-        const selectedCurrency = document.getElementById('adsCurrency').value;
-        document.getElementById('adCurrLabel').innerText = selectedCurrency;
-        if(document.getElementById('resultsBox').style.display === "block") {
-            calculateROI();
-        }
-    }
-
     function calculateROI() {
         const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
         const revenue = parseFloat(document.getElementById('revenue').value) || 0;
         const costs = parseFloat(document.getElementById('costs').value) || 0;
-        const adsCurrency = document.getElementById('adsCurrency').value;
         
         if (adSpend === 0 && revenue === 0) {
-            alert("Please enter valid numbers / يرجى إدخال أرقام صحيحة");
+            alert("Please enter valid numbers to calculate!");
             return;
         }
-
-        // Exchange rates (Black Market / Parallel Market estimation)
-        // 1 USD = 220 DA | 1 EUR = 240 DA
-        const usdRate = 220;
-        const eurRate = 240;
         
-        let adSpendInDA = adSpend;
-        if (adsCurrency === '$') {
-            adSpendInDA = adSpend * usdRate;
-        } else if (adsCurrency === '€') {
-            adSpendInDA = adSpend * eurRate;
-        }
-        
-        // ROAS calculation is standard (Revenue / Ad Spend in the same value context)
-        // Since ROAS = Revenue / AdSpend, we can convert Revenue to Ads currency or vice versa.
-        // Let's do: Revenue in Currency / AdSpend
-        let revenueInAdsCurrency = revenue;
-        if (adsCurrency === '$') { revenueInAdsCurrency = revenue / usdRate; }
-        else if (adsCurrency === '€') { revenueInAdsCurrency = revenue / eurRate; }
-        
-        const roas = adSpend > 0 ? (revenueInAdsCurrency / adSpend).toFixed(2) : 0;
-        
-        // Net Profit always in DA (since local business relies on DA)
-        const netProfit = revenue - (adSpendInDA + costs);
-        const totalInvestmentInDA = adSpendInDA + costs;
-        const roi = totalInvestmentInDA > 0 ? ((netProfit / totalInvestmentInDA) * 100).toFixed(1) : 0;
+        const roas = adSpend > 0 ? (revenue / adSpend).toFixed(2) : 0;
+        const netProfit = revenue - (adSpend + costs);
+        const totalInvestment = adSpend + costs;
+        const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
         
         document.getElementById('roasVal').innerText = roas + " x";
-        document.getElementById('netProfitVal').innerText = netProfit.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + " DA";
+        document.getElementById('netProfitVal').innerText = netProfit.toFixed(2) + " $";
         document.getElementById('roiVal').innerText = roi + " %";
         
         const profitSpan = document.getElementById('netProfitVal');
@@ -324,9 +326,9 @@
         myChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Ad Spend (DA)', 'Product & Shipping (DA)', 'Net Profit (DA)'],
+                labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
                 datasets: [{
-                    data: [adSpendInDA, costs, displayProfit],
+                    data: [adSpend, costs, displayProfit],
                     backgroundColor: ['#3b82f6', '#475569', '#10b981'],
                     borderColor: '#1e293b',
                     borderWidth: 2,
@@ -341,7 +343,7 @@
                         position: 'bottom',
                         labels: {
                             padding: 20,
-                            font: { size: 11, weight: '600' }
+                            font: { size: 12, weight: '600' }
                         }
                     },
                     tooltip: {
