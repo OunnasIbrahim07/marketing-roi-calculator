@@ -1,365 +1,432 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-commerce ROI & ROAS Calculator 📊</title>
-    <!-- Chart.js library for beautiful graphs -->
+    <title>Advanced E-commerce ROI & ROAS Calculator</title>
+    <!-- Chart.js for beautiful analytics charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts for premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Dark Theme & Layout */
         :root {
-            --primary-neon: #3b82f6; /* Neon Blue */
-            --primary-hover: #60a5fa;
-            --success-neon: #10b981; /* Neon Green */
-            --danger-neon: #ef4444; /* Neon Red */
-            --affiliate-neon: #ff007f; /* Neon Pink for Affiliate */
-            --bg-dark: #0f172a; /* Deep Dark Blue-Grey */
-            --card-glass: rgba(30, 41, 59, 0.7); /* Translucent Card */
-            --text-main: #f1f5f9; /* Near White */
-            --text-muted: #94a3b8; /* Greyed Text */
-            --input-bg: rgba(51, 65, 85, 0.5); /* Darker Input */
-            --border-glass: rgba(148, 163, 184, 0.2); /* Soft Border */
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --neon-blue: #3b82f6;
+            --minea-purple: #8b5cf6;
+            --pipiads-orange: #f97316;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 10% 10%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-                radial-gradient(at 90% 90%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
             color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
         }
 
-        /* Glassmorphism Card Effect */
         .container {
-            background: var(--card-glass);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-width: 1000px;
             width: 100%;
-            max-width: 550px;
-            transition: transform 0.3s ease;
-        }
-        
-        .container:hover {
-            transform: translateY(-5px);
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 2.5rem;
         }
 
-        h2 {
+        header {
             text-align: center;
-            color: var(--text-main);
-            margin-bottom: 30px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-shadow: 0 0 15px rgba(255,255,255,0.2);
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
+        .input-group label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper span {
+            position: absolute;
+            left: 1rem;
             color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        button.calc-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 1rem;
+        }
+
+        button.calc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric-card h3 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        input {
-            width: 100%;
-            padding: 14px 18px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 16px;
-            color: var(--text-main);
-            transition: all 0.3s ease;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: var(--primary-neon);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
-            background-color: rgba(51, 65, 85, 0.8);
-        }
-        
-        input::placeholder {
-            color: rgba(148, 163, 184, 0.6);
-        }
-
-        button {
-            width: 100%;
-            background: var(--primary-neon);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 17px;
+        .metric-card p {
+            font-size: 1.3rem;
             font-weight: 700;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-        }
-        
-        button:hover {
-            background: var(--primary-hover);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-            transform: translateY(-2px);
-        }
-
-        .results {
-            margin-top: 35px;
-            padding: 25px;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 16px;
-            border: 1px solid var(--border-glass);
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 16px;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-            padding-bottom: 10px;
-        }
-        
-        .result-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        
-        .result-label {
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .highlight {
-            font-weight: 800;
-            font-size: 18px;
-            color: var(--success-neon);
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-        }
-        
-        .highlight.negative {
-            color: var(--danger-neon);
-            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
         }
 
         .chart-container {
-            margin-top: 30px;
-            max-height: 280px;
-            display: flex;
-            justify-content: center;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            position: relative;
+            width: 100%;
+            max-width: 250px;
+            margin: 0 auto;
         }
 
-        /* High-Value Affiliate Section */
-        .partner-section {
-            margin-top: 35px;
-            border-top: 1px dashed var(--border-glass);
-            padding-top: 25px;
+        /* Premium Promo Section for Affiliates */
+        .promo-section {
+            max-width: 1000px;
+            width: 100%;
             text-align: center;
         }
 
-        .partner-title {
-            font-size: 13px;
+        .promo-title {
+            font-size: 1.1rem;
             color: var(--text-muted);
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-            font-weight: 700;
         }
 
-        .affiliate-btn {
-            display: block;
-            background: linear-gradient(135deg, #ff007f 0%, #7928ca 100%);
-            color: white;
+        .promo-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .promo-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .promo-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
             text-decoration: none;
-            padding: 14px;
-            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .promo-card.minea {
+            border-left: 4px solid var(--minea-purple);
+        }
+
+        .promo-card.pipiads {
+            border-left: 4px solid var(--pipiads-orange);
+        }
+
+        .promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .promo-card.minea:hover {
+            border-color: var(--minea-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .promo-card.pipiads:hover {
+            border-color: var(--pipiads-orange);
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.2);
+        }
+
+        .promo-logo {
+            font-size: 1.4rem;
             font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .affiliate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 0, 127, 0.5);
-            filter: brightness(1.1);
+        .minea .promo-logo { color: var(--minea-purple); }
+        .pipiads .promo-logo { color: var(--pipiads-orange); }
+
+        .promo-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
         }
 
-        .affiliate-btn.secondary {
-            background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
-        }
-
-        .affiliate-btn.secondary:hover {
-            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.5);
+        .promo-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>E-commerce ROI & ROAS Calculator 📊</h2>
-    
-    <div class="input-group">
-        <label>Total Ad Spend ($):</label>
-        <input type="number" id="adSpend" placeholder="e.g. 100" required>
-    </div>
-    
-    <div class="input-group">
-        <label>Total Revenue Generated ($):</label>
-        <input type="number" id="revenue" placeholder="e.g. 350" required>
-    </div>
-    
-    <div class="input-group">
-        <label>Product Cost & Shipping ($):</label>
-        <input type="number" id="costs" placeholder="e.g. 120" required>
-    </div>
-    
-    <button onclick="calculateROI()">Calculate Results 🚀</button>
-    
-    <div class="results" id="resultsBox">
-        <div class="result-item">
-            <span class="result-label">Return on Ad Spend (ROAS):</span>
-            <span id="roasVal" class="highlight">0</span>
+    <div class="container">
+        <header>
+            <h1>E-Commerce ROI & ROAS Calculator</h1>
+            <p>Calculate your true net profit, ROAS, and return on investment instantly.</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Inputs Form -->
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Total Ad Spend</label>
+                    <div class="input-wrapper"><span>$</span><input type="number" id="adSpend" value="1000" placeholder="0"></div>
+                </div>
+                <div class="input-group">
+                    <label>Total Revenue (Sales)</label>
+                    <div class="input-wrapper"><span>$</span><input type="number" id="revenue" value="3000" placeholder="0"></div>
+                </div>
+                <div class="input-group">
+                    <label>Product Cost (COGS)</label>
+                    <div class="input-wrapper"><span>$</span><input type="number" id="productCost" value="800" placeholder="0"></div>
+                </div>
+                <div class="input-group">
+                    <label>Shipping & Fees (Per Order Total)</label>
+                    <div class="input-wrapper"><span>$</span><input type="number" id="shippingCost" value="400" placeholder="0"></div>
+                </div>
+                <button class="calc-btn" onclick="calculateROI()">Calculate Performance</button>
+            </div>
+
+            <!-- Live Analytics Dashboard -->
+            <div class="results-section">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <h3>Net Profit</h3>
+                        <p id="netProfit" style="color: var(--neon-green);">$800.00</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>ROAS</h3>
+                        <p id="roasValue" style="color: var(--neon-blue);">3.0x</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>ROI</h3>
+                        <p id="roiValue" style="color: var(--neon-green);">80.0%</p>
+                    </div>
+                    <div class="metric-card">
+                        <h3>Total Costs</h3>
+                        <p id="totalCosts" style="color: var(--text-main);">$2,200.00</p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="profitChart"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="result-item">
-            <span class="result-label">Net Profit ($):</span>
-            <span id="netProfitVal" class="highlight">0</span>
-        </div>
-        <div class="result-item">
-            <span class="result-label">Return on Investment (ROI):</span>
-            <span id="roiVal" class="highlight">0</span>
-        </div>
-        
-        <div class="chart-container">
-            <canvas id="profitChart"></canvas>
+    </div>
+
+    <!-- Affiliate Recommendations -->
+    <div class="promo-section">
+        <h2 class="promo-title">Recommended E-Commerce Spy Tools</h2>
+        <div class="promo-buttons">
+            <!-- Minea Button -->
+            <a href="https://minea.com" target="_blank" class="promo-card minea">
+                <div class="promo-logo">Minea</div>
+                <p>Find winning products on TikTok, Facebook, and Pinterest ads instantly with deep AI analytics.</p>
+                <div class="promo-badge">Claim Free Trial</div>
+            </a>
+
+            <!-- PiPiADS Button -->
+            <a href="https://pipiads.com" target="_blank" class="promo-card pipiads">
+                <div class="promo-logo">PiPiADS</div>
+                <p>The world's largest TikTok ads spy tool. Find viral products and copy competitors' exact ad strategies.</p>
+                <div class="promo-badge">Get Exclusive Discount</div>
+            </a>
         </div>
     </div>
 
-    <!-- The Money Machine Section -->
-    <div class="partner-section">
-        <div class="partner-title">🔥 Scale Your Ads Like a Pro</div>
-        <!-- Replace '#' with your actual affiliate link from Minea -->
-        <a href="#" target="_blank" class="affiliate-btn">🚀 Spy on Competitors' Winning Ads with Minea</a>
-        <!-- Replace '#' with your actual affiliate link from PiPiADS -->
-        <a href="#" target="_blank" class="affiliate-btn secondary">💎 Find Viral TikTok Products with PiPiADS</a>
-    </div>
-</div>
+    <script>
+        let ctx = document.getElementById('profitChart').getContext('2d');
+        let profitChart;
 
-<script>
-    let myChart = null;
-
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.font.family = "'Segoe UI', sans-serif";
-
-    function calculateROI() {
-        const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
-        const revenue = parseFloat(document.getElementById('revenue').value) || 0;
-        const costs = parseFloat(document.getElementById('costs').value) || 0;
-        
-        if (adSpend === 0 && revenue === 0) {
-            alert("Please enter valid numbers to calculate!");
-            return;
-        }
-        
-        const roas = adSpend > 0 ? (revenue / adSpend).toFixed(2) : 0;
-        const netProfit = revenue - (adSpend + costs);
-        const totalInvestment = adSpend + costs;
-        const roi = totalInvestment > 0 ? ((netProfit / totalInvestment) * 100).toFixed(1) : 0;
-        
-        document.getElementById('roasVal').innerText = roas + " x";
-        document.getElementById('netProfitVal').innerText = netProfit.toFixed(2) + " $";
-        document.getElementById('roiVal').innerText = roi + " %";
-        
-        const profitSpan = document.getElementById('netProfitVal');
-        const roiSpan = document.getElementById('roiVal');
-        
-        if (netProfit < 0) {
-            profitSpan.className = "highlight negative";
-            roiSpan.className = "highlight negative";
-        } else {
-            profitSpan.className = "highlight";
-            roiSpan.className = "highlight";
-        }
-        
-        document.getElementById('resultsBox').style.display = "block";
-
-        const ctx = document.getElementById('profitChart').getContext('2d');
-        
-        if (myChart) {
-            myChart.destroy();
-        }
-
-        const displayProfit = netProfit > 0 ? netProfit : 0;
-
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Ad Spend', 'Product Costs', 'Net Profit'],
-                datasets: [{
-                    data: [adSpend, costs, displayProfit],
-                    backgroundColor: ['#3b82f6', '#475569', '#10b981'],
-                    borderColor: '#1e293b',
-                    borderWidth: 2,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                cutout: '65%',
-                plugins: {
-                    legend: { 
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: { size: 12, weight: '600' }
-                        }
+        function initChart(profit, costs) {
+            profitChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Net Profit', 'Total Costs'],
+                    datasets: [{
+                        data: [profit, costs],
+                        backgroundColor: [
+                            profit >= 0 ? '#10b981' : '#ef4444',
+                            '#1e293b'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    tooltip: {
-                        backgroundColor: '#1e293b',
-                        titleColor: '#f1f5f9',
-                        bodyColor: '#f1f5f9',
-                        borderColor: 'rgba(148, 163, 184, 0.2)',
-                        borderWidth: 1,
-                        padding: 12,
-                        cornerRadius: 8
-                    }
+                    cutout: '75%'
                 }
-            }
-        });
-    }
-</script>
+            });
+        }
 
+        function calculateROI() {
+            const adSpend = parseFloat(document.getElementById('adSpend').value) || 0;
+            const revenue = parseFloat(document.getElementById('revenue').value) || 0;
+            const productCost = parseFloat(document.getElementById('productCost').value) || 0;
+            const shippingCost = parseFloat(document.getElementById('shippingCost').value) || 0;
+
+            const totalCosts = adSpend + productCost + shippingCost;
+            const netProfit = revenue - totalCosts;
+            
+            const roas = adSpend > 0 ? (revenue / adSpend).toFixed(1) : '0.0';
+            const roi = totalCosts > 0 ? ((netProfit / totalCosts) * 100).toFixed(1) : '0.0';
+
+            // UI Elements update
+            const netProfitEl = document.getElementById('netProfit');
+            const roiValueEl = document.getElementById('roiValue');
+            const roasValueEl = document.getElementById('roasValue');
+            const totalCostsEl = document.getElementById('totalCosts');
+
+            netProfitEl.innerText = (netProfit >= 0 ? '$' : '-$') + Math.abs(netProfit).toFixed(2);
+            netProfitEl.style.color = netProfit >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+            
+            roiValueEl.innerText = roi + '%';
+            roiValueEl.style.color = netProfit >= 0 ? 'var(--neon-green)' : 'var(--neon-red)';
+            
+            roasValueEl.innerText = roas + 'x';
+            totalCostsEl.innerText = '$' + totalCosts.toFixed(2);
+
+            // Chart Update logic
+            if (profitChart) {
+                profitChart.destroy();
+            }
+            
+            // For chart visual balance if profit is negative
+            let chartProfit = netProfit > 0 ? netProfit : 0;
+            initChart(chartProfit, totalCosts);
+        }
+
+        // Initialize with default values
+        initChart(800, 2200);
+    </script>
 </body>
 </html>
